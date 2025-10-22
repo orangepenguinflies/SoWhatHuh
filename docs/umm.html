@@ -4,31 +4,58 @@
   <meta charset="UTF-8">
   <title>Captcha Verification</title>
   <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #00b4d8, #48cae4);
+      color: white;
+      text-align: center;
+    }
+    h3 {
+      margin-bottom: 1rem;
+    }
+    p {
+      background: rgba(0,0,0,0.3);
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+    }
+  </style>
   <script>
-   
+    // Display current build time for update confirmation
+    function showBuildTime() {
+      document.getElementById("time").textContent = new Date().toLocaleString();
+    }
+
+    // Called by reCAPTCHA when user completes challenge
     function onCaptchaCompleted(token) {
       console.log("Captcha completed! Token:", token);
 
-     
+      // --- Send message to Unity ---
       if (window.Unity) {
-        
         window.location = "unity:?captchaToken=" + token;
       } else if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.unityControl) {
-        
         window.webkit.messageHandlers.unityControl.postMessage("unity:?captchaToken=" + token);
       } else {
         console.log("Unity bridge not detected; logging only:", token);
       }
     }
+
+    window.onload = showBuildTime;
   </script>
 </head>
-<body style="display:flex;align-items:center;justify-content:center;height:100vh;background:#f7f8fa;">
-  <div>
-    <h3>Please verify you're not a robot</h3>
-    <div class="g-recaptcha"
-         data-sitekey="6LeA6fIrAAAAAIrvKir_PsRoPyVLuhwjIF-U0q24"
-         data-callback="onCaptchaCompleted">
-    </div>
+<body>
+  <h3>Please verify you're not a robot</h3>
+  <p>Build time: <span id="time"></span></p>
+  <div class="g-recaptcha"
+       data-sitekey="6LeA6fIrAAAAAIrvKir_PsRoPyVLuhwjIF-U0q24"
+       data-callback="onCaptchaCompleted">
   </div>
 </body>
 </html>
