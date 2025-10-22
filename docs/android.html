@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Captcha Verification</title>
+  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #121212;
+      color: #ffffff;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    h3 {
+      margin-bottom: 1rem;
+      animation: fadeIn 1s ease forwards;
+    }
+
+    p {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      animation: fadeIn 1.5s ease forwards;
+    }
+
+    .g-recaptcha {
+      margin-top: 1rem;
+      animation: fadeIn 2s ease forwards;
+    }
+
+    /* Success animation */
+    .success-container {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      animation: fadeIn 1s ease forwards;
+      animation-delay: 0.3s;
+    }
+
+    .success-message {
+      font-size: 2em;
+      margin-bottom: 1rem;
+      color: #00ff99;
+      animation: bounce 1s infinite alternate;
+    }
+
+    .return-message {
+      font-size: 1.2em;
+      color: #ffffff;
+      animation: fadeInUp 1s ease forwards;
+    }
+
+    @keyframes fadeIn {
+      from {opacity: 0;}
+      to {opacity: 1;}
+    }
+
+    @keyframes bounce {
+      0% { transform: translateY(0);}
+      100% { transform: translateY(-15px);}
+    }
+
+    @keyframes fadeInUp {
+      0% { transform: translateY(20px); opacity: 0;}
+      100% { transform: translateY(0); opacity: 1;}
+    }
+  </style>
+  <script>
+    // Display current time for verification
+    function showBuildTime() {
+      document.getElementById("time").textContent = new Date().toLocaleString();
+    }
+
+    // Called when Google reCAPTCHA is completed
+    function onCaptchaCompleted(token) {
+      // Send token to Unity
+      if (window.Unity) {
+        window.Unity.call("unity:?captchaToken=" + token);
+      } else if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.unityControl) {
+        window.webkit.messageHandlers.unityControl.postMessage("unity:?captchaToken=" + token);
+      }
+
+      // Replace CAPTCHA with success animation & message
+      document.body.innerHTML = `
+        <div class="success-container">
+          <div class="success-message">✅ Verification Complete!</div>
+          <div class="return-message">You can now return to the CLOUD app</div>
+        </div>
+      `;
+    }
+
+    window.onload = showBuildTime;
+  </script>
+</head>
+<body>
+  <h3>Please verify you're not a robot</h3>
+  <p>Build time: <span id="time"></span></p>
+  <div class="g-recaptcha"
+       data-sitekey="6LeA6fIrAAAAAIrvKir_PsRoPyVLuhwjIF-U0q24"
+       data-callback="onCaptchaCompleted">
+  </div>
+</body>
+</html>
