@@ -17,10 +17,12 @@
       background: #121212;
       color: #ffffff;
       text-align: center;
+      overflow: hidden;
     }
 
     h3 {
       margin-bottom: 1rem;
+      animation: fadeIn 1s ease forwards;
     }
 
     p {
@@ -28,10 +30,51 @@
       padding: 0.5rem 1rem;
       border-radius: 8px;
       margin-bottom: 1rem;
+      animation: fadeIn 1.5s ease forwards;
     }
 
     .g-recaptcha {
       margin-top: 1rem;
+      animation: fadeIn 2s ease forwards;
+    }
+
+    /* Success animation */
+    .success-container {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      animation: fadeIn 1s ease forwards;
+      animation-delay: 0.3s;
+    }
+
+    .success-message {
+      font-size: 2em;
+      margin-bottom: 1rem;
+      color: #00ff99;
+      animation: bounce 1s infinite alternate;
+    }
+
+    .return-message {
+      font-size: 1.2em;
+      color: #ffffff;
+      animation: fadeInUp 1s ease forwards;
+    }
+
+    @keyframes fadeIn {
+      from {opacity: 0;}
+      to {opacity: 1;}
+    }
+
+    @keyframes bounce {
+      0% { transform: translateY(0);}
+      100% { transform: translateY(-15px);}
+    }
+
+    @keyframes fadeInUp {
+      0% { transform: translateY(20px); opacity: 0;}
+      100% { transform: translateY(0); opacity: 1;}
     }
   </style>
   <script>
@@ -42,22 +85,19 @@
 
     // Called when Google reCAPTCHA is completed
     function onCaptchaCompleted(token) {
-      alert("Captcha token: " + token); // optional for testing
-
-      // --- Send token to Unity ---
+      // Send token to Unity
       if (window.Unity) {
         window.Unity.call("unity:?captchaToken=" + token);
       } else if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.unityControl) {
         window.webkit.messageHandlers.unityControl.postMessage("unity:?captchaToken=" + token);
-      } else {
-        console.log("Unity bridge not detected; token:", token);
       }
 
-      // Replace CAPTCHA with success message
+      // Replace CAPTCHA with success animation & message
       document.body.innerHTML = `
-        <h2>✅ CAPTCHA solved!</h2>
-        <p>Token sent to Unity.</p>
-        <p>Build time: <strong>${new Date().toLocaleString()}</strong></p>
+        <div class="success-container">
+          <div class="success-message">✅ Verification Complete!</div>
+          <div class="return-message">You can now return to the CLOUD app</div>
+        </div>
       `;
     }
 
@@ -73,4 +113,3 @@
   </div>
 </body>
 </html>
-
