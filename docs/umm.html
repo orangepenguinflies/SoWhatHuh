@@ -1,26 +1,34 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <script src="https://www.google.com/recaptcha/api.js"></script>
-    <style>
-      body {
-        background: transparent;
-        display: flex;
-        justify-content: center;
-        margin-top: 100px;
-      }
-    </style>
-  </head>
-  <body>
-    
-    <div class="g-recaptcha" data-sitekey="6LeA6fIrAAAAAIrvKir_PsRoPyVLuhwjIF-U0q24" data-callback="onCaptchaSuccess"></div>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Captcha Verification</title>
+  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+  <script>
+   
+    function onCaptchaCompleted(token) {
+      console.log("Captcha completed! Token:", token);
 
-    <script>
-      function onCaptchaSuccess(token) {
+     
+      if (window.Unity) {
         
         window.location = "unity:?captchaToken=" + token;
+      } else if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.unityControl) {
+        
+        window.webkit.messageHandlers.unityControl.postMessage("unity:?captchaToken=" + token);
+      } else {
+        console.log("Unity bridge not detected; logging only:", token);
       }
-    </script>
-  </body>
+    }
+  </script>
+</head>
+<body style="display:flex;align-items:center;justify-content:center;height:100vh;background:#f7f8fa;">
+  <div>
+    <h3>Please verify you're not a robot</h3>
+    <div class="g-recaptcha"
+         data-sitekey="6LeA6fIrAAAAAIrvKir_PsRoPyVLuhwjIF-U0q24"
+         data-callback="onCaptchaCompleted">
+    </div>
+  </div>
+</body>
 </html>
