@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Captcha Verification</title>
+  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+  <style>
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #121212;
+      color: #ffffff;
+      flex-direction: column;
+      text-align: center;
+    }
+
+    .captcha-box {
+      background: #1f1f1f;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.5);
+      width: 300px;
+    }
+
+    input.token-field {
+      width: 100%;
+      padding: 8px;
+      margin-top: 10px;
+      border-radius: 6px;
+      border: none;
+      background: #333;
+      color: #fff;
+      font-size: 14px;
+      text-align: center;
+    }
+
+    button.copy-btn {
+      margin-top: 10px;
+      padding: 8px 16px;
+      border-radius: 6px;
+      border: none;
+      background: #00ff99;
+      color: #000;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    p.guide {
+      margin-top: 12px;
+      font-size: 14px;
+      color: #aaa;
+    }
+  </style>
+  <script>
+    let captchaToken = "";
+
+    function onCaptchaCompleted(token) {
+      captchaToken = token;
+
+      // Display token box
+      document.getElementById("tokenBox").style.display = "block";
+      document.getElementById("tokenField").value = captchaToken;
+    }
+
+    function copyToken() {
+      if (!captchaToken) return;
+      navigator.clipboard.writeText(captchaToken)
+        .then(() => alert("Token copied! Paste it back into the Unity app."))
+        .catch(() => alert("Failed to copy token. Please copy manually."));
+    }
+  </script>
+</head>
+<body>
+  <div class="captcha-box">
+    <h3>Verify You're Not a Robot</h3>
+    <div class="g-recaptcha"
+         data-sitekey="6LeA6fIrAAAAAIrvKir_PsRoPyVLuhwjIF-U0q24"
+         data-callback="onCaptchaCompleted">
+    </div>
+
+    <!-- Token box (hidden until CAPTCHA solved) -->
+    <div id="tokenBox" style="display:none; margin-top:15px;">
+      <input type="text" id="tokenField" class="token-field" readonly>
+      <button class="copy-btn" onclick="copyToken()">Copy Token</button>
+      <p class="guide">After copying, return to the Unity app and paste the token.</p>
+    </div>
+  </div>
+</body>
+</html>
