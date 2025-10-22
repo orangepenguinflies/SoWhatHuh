@@ -1,19 +1,76 @@
 <!DOCTYPE html>
-<html>
-  <body style="display:flex;align-items:center;justify-content:center;height:100vh;">
-    <button onclick="sendToUnity()">Send Message</button>
-    <script>
-      function sendToUnity() {
-        alert('sending');
-        // try all known bridge syntaxes
-        if (window.Unity) {
-          window.Unity.call("unity:?captchaToken=test123");
-        } else if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.unityControl) {
-          window.webkit.messageHandlers.unityControl.postMessage("unity:?captchaToken=test123");
-        } else {
-          window.location = "unity:?captchaToken=test123";
-        }
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Captcha Verification</title>
+  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #121212;
+      color: #ffffff;
+      text-align: center;
+    }
+
+    h3 {
+      margin-bottom: 1rem;
+    }
+
+    p {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+    }
+
+    .g-recaptcha {
+      margin-top: 1rem;
+    }
+  </style>
+  <script>
+    // Display current time for verification
+    function showBuildTime() {
+      document.getElementById("time").textContent = new Date().toLocaleString();
+    }
+
+    // Called when Google reCAPTCHA is completed
+    function onCaptchaCompleted(token) {
+      alert("Captcha token: " + token); // optional for testing
+
+      // --- Send token to Unity ---
+      if (window.Unity) {
+        window.Unity.call("unity:?captchaToken=" + token);
+      } else if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.unityControl) {
+        window.webkit.messageHandlers.unityControl.postMessage("unity:?captchaToken=" + token);
+      } else {
+        console.log("Unity bridge not detected; token:", token);
       }
-    </script>
-  </body>
+
+      // Replace CAPTCHA with success message
+      document.body.innerHTML = `
+        <h2>✅ CAPTCHA solved!</h2>
+        <p>Token sent to Unity.</p>
+        <p>Build time: <strong>${new Date().toLocaleString()}</strong></p>
+      `;
+    }
+
+    window.onload = showBuildTime;
+  </script>
+</head>
+<body>
+  <h3>Please verify you're not a robot</h3>
+  <p>Build time: <span id="time"></span></p>
+  <div class="g-recaptcha"
+       data-sitekey="6LeA6fIrAAAAAIrvKir_PsRoPyVLuhwjIF-U0q24"
+       data-callback="onCaptchaCompleted">
+  </div>
+</body>
 </html>
+
